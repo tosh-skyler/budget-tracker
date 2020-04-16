@@ -40,17 +40,6 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-//Enable service worker to intercept network requests...
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.match(event.request).then(response => {
-        return response || fetch(event.request);
-      });
-    })
-  );
-});
-
 // Cache responses for requests for data...
 self.addEventListener('fetch', event => {
   if (event.request.url.includes('/api/')) {
