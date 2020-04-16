@@ -26,7 +26,7 @@ self.addEventListener('install', event => {
 // Activates service worker and removes old data from cache...
 self.addEventListener('activate', event => {
   event.waitUntil(
-    cache.keys().then(keyList => {
+    caches.keys().then(keyList => {
       return Promise.all(
         keyList.map(key => {
           if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
