@@ -10,6 +10,8 @@ const FILES_TO_CACHE = [
 const CACHE_NAME = 'static-cache-v2';
 const DATA_CACHE_NAME = 'data-cache-v1';
 
+
+// Install and register service worker...
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
@@ -21,6 +23,7 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
+// Activates service worker and removes old data from cache...
 self.addEventListener('activate', event => {
   event.waitUntil(
     cache.keys().then(keyList => {
@@ -37,7 +40,41 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
+//Enable service worker to intercept network requests...
 self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.match(event.request).then(response => {
+        return response || fetch(event.request);
+      });
+    })
+  );
+});
+
+// Cache responses for requests for data...
+self.addEventListener('fetch', event => {
+  if (event.request.url.includes('/api/')) {
+    console.log('[Service Worker] Fetch (data)', event.request.url);
+
+    event.respondWith(
+      caches.open(DATA_CACHE_NAME).then(cache => {
+        return fetch(event.request)
+          .then(response => {
+            if (response.status === 200) {
+              cache.put(event.request.url, response.clone());
+            }
+
+            return response;
+          })
+          .catch(err => {
+            return cache.match(event.request);
+          });
+      })
+    );
+
+    return;
+  }
+
   event.respondWith(
     caches.open(CACHE_NAME).then(cache => {
       return cache.match(event.request).then(response => {
