@@ -12,7 +12,7 @@ With this appliction, enter the name of a line item and a value. You are then ab
 
 ## Credits
 
-Thanks to UW Coding Bootcamp for providing me with the boilerplate.
+Thank you Akhil for being a great teacher.
 
 ## License
 
